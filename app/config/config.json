@@ -1,0 +1,24 @@
+{
+  "development": {
+    "username": "makebaby",
+    "password": "&ic160512kP",
+    "database": "makebaby_learning",
+    "host": "mi3-ss32.a2hosting.com",
+    "port": "3306",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "",
+    "password": null,
+    "database": "",
+    "host": "",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "",
+    "password": null,
+    "database": "",
+    "host": "127.0.0.1",
+    "dialect": "mysql"
+  }
+}
