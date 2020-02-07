@@ -1,10 +1,10 @@
 {
   "development": {
-    "username": "makebaby",
-    "password": "&ic160512kP",
-    "database": "makebaby_learning",
-    "host": "mi3-ss32.a2hosting.com",
-    "port": "3306",
+    "username": "yourname",
+    "password": "yourpassword",
+    "database": "yourdatabase",
+    "host": "yourhost",
+    "port": "yourport",
     "dialect": "mysql"
   },
   "test": {
