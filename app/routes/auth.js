@@ -7,16 +7,16 @@ module.exports = function(app, passport) {
     '/signup',
     passport.authenticate('local-signup', {
       successRedirect: '/dashboard',
-
-      failureRedirect: '/signup'
+      failureRedirect: '/signup',
+      failureFlash: true
     })
   );
   app.post(
     '/signin',
     passport.authenticate('local-signin', {
       successRedirect: '/dashboard',
-
-      failureRedirect: '/signin'
+      failureRedirect: '/signin',
+      failureFlash: true
     })
   );
   app.get('/dashboard', isLoggedIn, authController.dashboard);

@@ -23,31 +23,37 @@ module.exports = function(passport, account) {
               message: 'That email is already taken'
             });
           } else {
-            const accountPassword = await promiseWrapper((resolve, reject) => {
-              bcrypt.hash(password, 8, (err, hash) => {
-                if (err) {
-                  reject(err);
-                }
-                resolve(hash);
+            try {
+              const accountPassword = await promiseWrapper((resolve, reject) => {
+                bcrypt.hash(password, 8, (err, hash) => {
+                  if (err) {
+                    reject(err);
+                  }
+                  resolve(hash);
+                });
               });
-            });
 
-            const data = {
-              email: email,
-              password: accountPassword,
-              firstname: req.body.firstname,
-              lastname: req.body.lastname
-            };
+              const data = {
+                email: email,
+                password: accountPassword,
+                firstname: req.body.firstname,
+                lastname: req.body.lastname
+              };
 
-            Account.create(data).then(function(newAccount, created) {
-              if (!newAccount) {
-                return done(null, false);
-              }
+              Account.create(data).then(function(newAccount, created) {
+                if (!newAccount) {
+                  return done(null, false);
+                }
 
-              if (newAccount) {
-                return done(null, newAccount);
-              }
-            });
+                if (newAccount) {
+                  return done(null, newAccount);
+                }
+              });
+            } catch (err) {
+              return done(null, false, {
+                message: 'Something went wrong with your Signup'
+              });
+            }
           }
         });
       }
@@ -89,27 +95,24 @@ module.exports = function(passport, account) {
             email: email
           }
         })
-          .then(function(account) {
+          .then(async function(account) {
             if (!account) {
-              return done(null, false, {
-                message: 'Email does not exist'
-              });
-            }
-
-            if (!isValidPassword(account.password, password)) {
               return done(null, false, {
                 message: 'Incorrect password.'
               });
             }
 
-            var accountinfo = account.get();
-            return done(null, accountinfo);
+            try {
+              await isValidPassword(account.password, password);
+              var accountinfo = account.get();
+              return done(null, accountinfo);
+            } catch (err) {
+              return done(null, false, { message: 'Incorrect password.' });
+            }
           })
           .catch(function(err) {
-            console.log('Error:', err);
-
             return done(null, false, {
-              message: 'Something went wrong with your Signin'
+              message: 'Something went wrong with your Signin.'
             });
           });
       }

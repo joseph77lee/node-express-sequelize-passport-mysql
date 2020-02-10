@@ -5,3 +5,9 @@
   <input name="password" type="password" />
   <input class="btn" type="submit" value="Sign In" />
 </form>
+{{#if messages}}
+<div class="alert alert-danger">{{messages}}</div>
+{{/if}}
+{{#if error}}
+<div class="alert alert-danger">{{error}}</div>
+{{/if}}
