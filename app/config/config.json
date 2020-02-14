@@ -2,7 +2,7 @@
   "development": {
     "username": "your-db-username",
     "password": "your-db-password",
-    "database": "your-database",
+    "database": "your-db-name",
     "host": "your-db-host",
     "port": "3306",
     "dialect": "mysql"
