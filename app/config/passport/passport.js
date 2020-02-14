@@ -173,19 +173,19 @@ const sendVerificationEmail = (to, token) => {
   const hostUrl = process.env.HOST_URL;
   let transporter = nodemailer.createTransport({
     pool: true,
-    host: 'mail.makebabysmile.com',
+    host: 'your-main-host',
     port: 465,
     secure: true, // use TLS
     auth: {
-      user: 'coupang-helper@makebabysmile.com',
-      pass: 'cBTD9@H1lorC'
+      user: 'your-auth-user',
+      pass: 'your-auth-password'
     }
   });
 
   return new Promise((resolve, reject) => {
     transporter.sendMail(
       {
-        from: 'coupang-helper@makebabysmile.com',
+        from: 'your-from-email',
         to: to,
         subject: 'Verify Your Email',
         html: `<p>Verify you Email</p>
