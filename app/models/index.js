@@ -18,7 +18,7 @@ fs.readdirSync(__dirname)
   });
 
 Object.keys(db).forEach(function(modelName) {
-  if ('associate' in db[modelName]) {
+  if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
@@ -27,3 +27,9 @@ db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
 module.exports = db;
+
+// sequelize.query(`CREATE EVENT expireToken
+//               ON SCHEDULE AT CURRENT_TIMESTAMP + INTERVAL  1 DAY
+//               DO
+//               DELETE FROM verificationTokens WHERE createdAt < DATE_SUB(NOW(), INTERVAL 1 DAY);
+//       `);

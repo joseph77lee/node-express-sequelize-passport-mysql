@@ -1,50 +1,35 @@
-module.exports = function(sequelize, Sequelize) {
-  var Account = sequelize.define('account', {
-    id: {
-      autoIncrement: true,
-      primaryKey: true,
-      type: Sequelize.INTEGER
-    },
-
+module.exports = function(sequelize, DataTypes) {
+  const Account = sequelize.define('account', {
     firstname: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       notEmpty: true
     },
 
     lastname: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       notEmpty: true
     },
 
-    username: {
-      type: Sequelize.TEXT
-    },
-
-    about: {
-      type: Sequelize.TEXT
-    },
-
     email: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       validate: {
         isEmail: true
       }
     },
 
     password: {
-      type: Sequelize.STRING,
+      type: DataTypes.STRING,
       allowNull: false
     },
 
-    last_login: {
-      type: Sequelize.DATE
-    },
-
-    status: {
-      type: Sequelize.ENUM('active', 'inactive'),
-      defaultValue: 'active'
+    isVerified: {
+      type: DataTypes.BOOLEAN
     }
   });
+
+  Account.associate = function(models) {
+    models.account.hasOne(models.verificationToken);
+  };
 
   return Account;
 };

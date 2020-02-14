@@ -2,7 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const env = require('dotenv').config();
+
 const exphbs = require('express-handlebars');
 const flash = require('connect-flash');
 
@@ -31,7 +31,7 @@ const setStrategies = require('./app/config/passport/passport.js');
 const setAuthRoutes = require('./app/routes/auth.js');
 
 //Load passport strategies
-setStrategies(passport, models.account);
+setStrategies(passport, models);
 
 //Routes
 setAuthRoutes(app, passport);

@@ -1,7 +1,11 @@
+require('dotenv').config();
 const bcrypt = require('bcrypt');
+const crypto = require('crypto-random-string');
+const nodemailer = require('nodemailer');
 
-module.exports = function(passport, account) {
-  const Account = account;
+module.exports = function(passport, models) {
+  const Account = models.account;
+  const VerificationToken = models.verificationToken;
   const LocalStrategy = require('passport-local').Strategy;
 
   passport.use(
@@ -42,11 +46,31 @@ module.exports = function(passport, account) {
 
               Account.create(data).then(function(newAccount, created) {
                 if (!newAccount) {
-                  return done(null, false);
+                  return done(null, false, {
+                    message: 'Internal error when creating an account.'
+                  });
                 }
 
                 if (newAccount) {
-                  return done(null, newAccount);
+                  VerificationToken.create({
+                    accountId: newAccount.id,
+                    token: crypto({ length: 30 })
+                  })
+                    .then(result => {
+                      try {
+                        sendVerificationEmail(newAccount.email, result.token);
+                        return done(null, newAccount);
+                      } catch (err) {
+                        return done(null, false, {
+                          message: 'Internal error when sending the verification email.'
+                        });
+                      }
+                    })
+                    .catch(error => {
+                      return done(null, false, {
+                        message: 'Internal error when creating verfication token.'
+                      });
+                    });
                 }
               });
             } catch (err) {
@@ -72,8 +96,6 @@ module.exports = function(passport, account) {
       },
 
       function(req, email, password, done) {
-        var Account = account;
-
         const isValidPassword = async function(userpass, password) {
           return await promiseWrapper((resolve, reject) => {
             bcrypt.compare(password, userpass, (err, isMatch) => {
@@ -99,6 +121,12 @@ module.exports = function(passport, account) {
             if (!account) {
               return done(null, false, {
                 message: 'Incorrect password.'
+              });
+            }
+
+            if (!account.isVerified) {
+              return done(null, false, {
+                message: 'Your account is not verified yet.'
               });
             }
 
@@ -140,3 +168,37 @@ const promiseWrapper = callback =>
   new Promise((resolve, reject) => {
     callback(resolve, reject);
   });
+
+const sendVerificationEmail = (to, token) => {
+  const hostUrl = process.env.HOST_URL;
+  let transporter = nodemailer.createTransport({
+    pool: true,
+    host: 'mail.makebabysmile.com',
+    port: 465,
+    secure: true, // use TLS
+    auth: {
+      user: 'coupang-helper@makebabysmile.com',
+      pass: 'cBTD9@H1lorC'
+    }
+  });
+
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(
+      {
+        from: 'coupang-helper@makebabysmile.com',
+        to: to,
+        subject: 'Verify Your Email',
+        html: `<p>Verify you Email</p>
+          <p>Click on this link to verify your email ${hostUrl}/verification?token=${token}&email=${to}</p>
+          `
+      },
+      (err, info, response) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(response);
+      }
+    );
+  });
+};
